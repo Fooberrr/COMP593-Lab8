@@ -1,0 +1,15 @@
+# Generated data files (per lab instructions - do not commit)
+*.db
+*.csv
+
+# Python cache/bytecode
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+.venv/
+
+# Editor/OS clutter
+.vscode/
+.DS_Store

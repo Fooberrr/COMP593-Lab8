@@ -7,6 +7,10 @@ Usage:
  python create_db.py
 """
 import os
+import random
+import sqlite3
+from datetime import datetime
+from faker import Faker
 
 # Determine the path of the database
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -18,9 +22,36 @@ def main():
 
 def create_people_table():
     """Creates the people table in the database"""
-    # TODO: Create function body
+     # TODO: Create function body
     # Hint: See example code in lab instructions entitled "Creating a Table"
     return
+    
+    con = sqlite3.connect(db_path)
+
+    cur = con.cursor()
+
+    create_ppl_tbl_query = """
+        CREATE TABLE IF NOT EXISTS people
+        (
+            id          INTEGER PRIMARY KEY,
+            name        TEXT NOT NULL,
+            email       TEXT NOT NULL,
+            address     TEXT NOT NULL,
+            city        TEXT NOT NULL,
+            province    TEXT NOT NULL,
+            bio         TEXT,
+            age         INTEGER,
+            created_at  DATETIME NOT NULL,
+            updated_at  DATETIME NOT NULL
+        );
+    """
+
+   
+    cur.execute(create_ppl_tbl_query)
+
+    
+    con.commit()
+    con.close()
 
 def populate_people_table():
     """Populates the people table with 200 fake people"""
@@ -28,6 +59,47 @@ def populate_people_table():
     # Hint: See example code in lab instructions entitled "Inserting Data into a Table"
     # Hint: See example code in lab instructions entitled "Working with Faker"
     return
+    con = sqlite3.connect(db_path)
+    cur = con.cursor()
+
+   
+    fake = Faker('en_CA')
+
+   
+    add_person_query = """
+        INSERT INTO people
+        (
+            name,
+            email,
+            address,
+            city,
+            province,
+            bio,
+            age,
+            created_at,
+            updated_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+    """
+
+    
+    for _ in range(200):
+        now = datetime.now().isoformat(sep=' ', timespec='seconds')
+        new_person = (
+            fake.name(),
+            fake.email(),
+            fake.street_address(),
+            fake.city(),
+            fake.administrative_unit(),
+            fake.text(max_nb_chars=150),
+            random.randint(1, 100),  # Age must be between 1 and 100
+            now,                     # created_at
+            now                      # updated_at
+        )
+        cur.execute(add_person_query, new_person)
+
+    con.commit()
+    con.close()
 
 if __name__ == '__main__':
    main()
